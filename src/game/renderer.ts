@@ -115,6 +115,31 @@ function renderGame(_: Ticker, app: Application, game: Game) {
     nextWrapper.y = 32
     stage.addChild(nextWrapper)
 
+    let heldWrapper = stage.getChildByLabel('held');
+    if (!heldWrapper) {
+        heldWrapper = new Container({
+            label: 'held'
+        });
+
+        heldWrapper.x = board.getBounds().right + 32
+        heldWrapper.y = 5 * 32
+        stage.addChild(heldWrapper)
+    }
+
+    console.log(heldWrapper)
+
+    heldWrapper.children.map((el) => el.destroy())
+
+    if (game.state.held) {
+        const heldBlocks = Object.values<Block>(game.state.held.blocks).map((block) => {
+            const sprite = Sprite.from('tetromino.webp');
+            sprite.position.set(block.point.x * sprite.width, block.point.y * sprite.height)
+            return sprite
+        })
+
+        heldWrapper.addChild(...heldBlocks)
+    }
+
     let scoreText = stage.getChildByLabel('score')
 
     if (scoreText) {

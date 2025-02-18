@@ -11,6 +11,8 @@ export class State {
   private _tetromino: Tetromino;
   private _tetrominoPosition: Point;
 
+  private _heldTetromino?: Tetromino
+
   private _blockBag: TetrominoBag = new TetrominoBag();
 
   constructor(width: number = 10, height: number = 24) {
@@ -44,6 +46,22 @@ export class State {
   }
   get tetrominoPosition() {
     return this._tetrominoPosition;
+  }
+
+  get held() {
+    return this._heldTetromino
+  }
+
+  swapTetromino() {
+    if (!this._heldTetromino) {
+      this._heldTetromino = this._tetromino;
+      this._tetromino = this._blockBag.getNext()
+    } else {
+      const held = this._heldTetromino;
+      const current = this._tetromino;
+      this._tetromino = held;
+      this._heldTetromino = current;
+    }
   }
 
   setBlock(point: Point, block?: Block) {

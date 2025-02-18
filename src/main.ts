@@ -14,9 +14,7 @@ import { sounds } from "./ui/sounds";
 
   sounds.bgm.play()
 
-
   let game = new Game(10, 24)
-
   let stepTimer = 0;
 
   app.ticker.add((time) => {
@@ -112,6 +110,10 @@ import { sounds } from "./ui/sounds";
 
         if (e.key === 'a') {
           game.state.attemptTetrominoRotateAntiClockwise();
+        }
+
+        if (e.key === 's') {
+          game.state.swapTetromino();
         }
       }
     },
