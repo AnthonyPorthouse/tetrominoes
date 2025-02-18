@@ -17,18 +17,6 @@ sounds.bgm.play()
 let game = new Game(10, 24)
 
 let stepTimer = 0;
-let stepSpeed = 1500;
-
-const stepSpeedText = new Text({
-  text: stepSpeed,
-  style: {
-    fill: 0xffffff,
-  }
-})
-
-stepSpeedText.y = 32;
-
-app.stage.addChild(stepSpeedText)
 
 app.ticker.add((time) => {
 
@@ -45,18 +33,30 @@ app.ticker.add((time) => {
   }
 
   if (game.gamestate === 'playing') {
-    stepTimer = stepTimer % stepSpeed
+    stepTimer = stepTimer % game.speed
     stepTimer += 1 * time.elapsedMS;
 
     if (time.elapsedMS % 100) {
       const clearedRows = game.state.clearRows();
+      switch(clearedRows) {
+        case 1:
+          game.score += 100;
+          break;
+        case 2:
+          game.score += 300;
+          break;
+        case 3:
+          game.score += 500;
+          break;
+        case 4:
+          game.score += 800;
+          break;
+      }
+
+      game.speed -= 10 * clearedRows
     }
 
-    if (stepTimer >= stepSpeed) {
-      stepSpeed = Math.round(Math.max(50, stepSpeed * 0.975))
-
-      stepSpeedText.text = stepSpeed
-
+    if (stepTimer >= game.speed) {
       game.state.moveTetrominoDown()
     }
   }
@@ -106,11 +106,11 @@ window.addEventListener(
       }
 
       if (e.key === 'd') {
-        game.state.tetromino.rotateClockwise();
+        game.state.attemptTetrominoRotateClockwise();
       }
 
       if (e.key === 'a') {
-        game.state.tetromino.rotateAntiClockwise();
+        game.state.attemptTetrominoRotateAntiClockwise();
       }
     }
   },

@@ -7,6 +7,7 @@ export interface Tetromino {
     rotateAntiClockwise(): void;
     readonly state: number[]
     readonly blocks: Record<string, Block>
+    readonly wallkickPositions: Record<'cw'|'ccw', Point[]>
 }
 
 export abstract class TetrominoBase implements Tetromino {
@@ -18,6 +19,84 @@ export abstract class TetrominoBase implements Tetromino {
     constructor() {
         this._color = getRandomColor();
         this._state = 0
+    }
+
+    get wallkickPositions() {
+
+        switch(this._state) {
+            default:
+            case 0:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(+1,  0),
+                        new Point(+1, -1),
+                        new Point( 0, +2),
+                        new Point(+1, +2),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(-1,  0),
+                        new Point(-1, -1),
+                        new Point( 0, +2),
+                        new Point(-1, +2),
+                    ]
+                }
+            case 1:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(-1,  0),
+                        new Point(-1, +1),
+                        new Point( 0, -2),
+                        new Point(-1, -2),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(-1,  0),
+                        new Point(-1, +1),
+                        new Point( 0, -2),
+                        new Point(-1, -2),
+                    ]
+                }
+            case 2:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(-1,  0),
+                        new Point(-1, -1),
+                        new Point( 0, +2),
+                        new Point(-1, +2),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(+1,  0),
+                        new Point(+1, -1),
+                        new Point( 0, +2),
+                        new Point(+1, +2),
+                    ]
+                }
+            case 3:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(+1,  0),
+                        new Point(+1, +1),
+                        new Point( 0, -2),
+                        new Point(+1, -2),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(+1,  0),
+                        new Point(+1, +1),
+                        new Point( 0, -2),
+                        new Point(+1, -2),
+                    ]
+                }
+
+        }
+
+
     }
 
     get position(): Point {
@@ -107,6 +186,83 @@ export class TetrominoI extends TetrominoBase {
         ],
     ]
 
+
+    get wallkickPositions() {
+
+        switch(this._state) {
+            default:
+            case 0:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(+2,  0),
+                        new Point(-1,  0),
+                        new Point(+2, +1),
+                        new Point(-1, -2),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(+1,  0),
+                        new Point(-2,  0),
+                        new Point(+1, -2),
+                        new Point(-2, +1),
+                    ]
+                }
+            case 1:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(+1,  0),
+                        new Point(-2,  0),
+                        new Point(+1, -2),
+                        new Point(-2, +1),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(-2,  0),
+                        new Point(+1,  0),
+                        new Point(-2, -1),
+                        new Point(+1, +2),
+                    ]
+                }
+            case 2:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(-2,  0),
+                        new Point(+1,  0),
+                        new Point(-2, -1),
+                        new Point(+1, +2),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(-1,  0),
+                        new Point(+2,  0),
+                        new Point(-1, +2),
+                        new Point(+2, -1),
+                    ]
+                }
+            case 3:
+                return {
+                    cw: [
+                        new Point( 0,  0),
+                        new Point(-1,  0),
+                        new Point(+2,  0),
+                        new Point(-1, +2),
+                        new Point(+2, -1),
+                    ],
+                    ccw: [
+                        new Point( 0,  0),
+                        new Point(+2,  0),
+                        new Point(-1,  0),
+                        new Point(+2, +1),
+                        new Point(-1, -2),
+                    ]
+                }
+        }
+
+
+    }
 
 }
 
@@ -237,13 +393,13 @@ export class TetrominoZ extends TetrominoBase {
 
 export class TetrominoBag {
     private tetrominos = [
-        new TetrominoI,
-        new TetrominoO,
-        new TetrominoT,
-        new TetrominoL,
-        new TetrominoJ,
-        new TetrominoS,
-        new TetrominoZ,
+        TetrominoI,
+        TetrominoO,
+        TetrominoT,
+        TetrominoL,
+        TetrominoJ,
+        TetrominoS,
+        TetrominoZ,
     ]
 
     private bag: Tetromino[] = [];
@@ -253,7 +409,7 @@ export class TetrominoBag {
     }
 
     private shuffle() {
-        this.bag = [...this.tetrominos]
+        this.bag = this.tetrominos.map((c) => new c)
         .map((t) => ({ val: t, sort: Math.random()}))
         .sort((a, b) => a.sort - b.sort)
         .map(({ val }) => val )

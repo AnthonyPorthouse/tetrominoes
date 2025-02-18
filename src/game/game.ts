@@ -8,6 +8,8 @@ export class Game {
     private _score: number = 0
     private _speed: number = 1000
 
+    private readonly _initialSpeed = 1000
+
     private _gamestate: 'menu' | 'playing' = 'menu'
 
     constructor(width: number, height: number) {
@@ -29,8 +31,16 @@ export class Game {
         return this._speed
     }
 
+    set speed(speed: number) {
+        this._speed = Math.round(Math.max(150, speed))
+    }
+
     get score() {
         return this._score
+    }
+
+    set score(score: number) {
+        this._score = score
     }
 
     get state() {
@@ -47,7 +57,7 @@ export class Game {
 
     reset() {
         this._state = new State(this.width, this.height);
-        this._score = 0;
-        this._speed = 1000;
+        this.score = 0;
+        this.speed = this._initialSpeed;
     }
 }

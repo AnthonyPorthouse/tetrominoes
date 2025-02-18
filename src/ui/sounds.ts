@@ -7,6 +7,5 @@ export const sounds = {
     bgm: new Howl( {
         src: ['bgm.ogg'],
         loop: true,
-        html5: true
     })
 } as const

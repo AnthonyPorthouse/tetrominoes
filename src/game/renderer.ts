@@ -1,4 +1,5 @@
 import { Application, Container, Sprite, Text, Ticker } from "pixi.js";
+import { buildUi } from "../ui";
 import { Point } from "../utils";
 import { Block } from "./block";
 import { Game } from "./game";
@@ -46,10 +47,14 @@ function renderMenu(time: Ticker, app: Application, game: Game) {
 
         text.anchor.set(0.5)
         text.position.set(app.screen.width / 2, app.screen.height / 2)
+        text.eventMode = 'dynamic'
 
         text.addEventListener('click', (e) => {
             e.preventDefault();
             game.gamestate = 'playing'
+            app.stage = new Container();
+            game.reset();
+            buildUi(app, game)
         })
 
         stage.addChild(text)
@@ -110,4 +115,39 @@ function renderGame(time: Ticker, app: Application, game: Game) {
     nextWrapper.y = 32
     stage.addChild(nextWrapper)
 
+    let scoreText = stage.getChildByLabel('score')
+
+    if (scoreText) {
+        (scoreText as Text).text = game.score
+    } else {
+        const score = new Text({
+            text: game.score,
+            style: {
+                fill: 0xffffff,
+            },
+            label: 'score'
+        })
+
+        score.anchor.set(1, 1)
+        score.position.y = board.getBounds().bottom;
+        score.position.x = board.getBounds().left - 32;
+
+        stage.addChild(score)
+    }
+
+    let speedText = stage.getChildByLabel('speed')
+    if (speedText) {
+        (speedText as Text).text = game.speed
+    } else {
+        const speedText = new Text({
+            text: game.speed,
+            style: {
+              fill: 0xffffff,
+            },
+            label: 'speed'
+          })
+          speedText.position.y = 32;
+          stage.addChild(speedText)
+
+    }
 }

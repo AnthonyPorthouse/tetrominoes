@@ -7,8 +7,16 @@ export class Point {
         this.y = y;
     }
 
+    public add(other: Point) {
+        return new Point(this.x + other.x, this.y + other.y)
+    }
+
     public toKey() {
         return `${this.x},${this.y}`
+    }
+
+    get [Symbol.toStringTag]() {
+        return this.toKey()
     }
 
     static fromKey(key: string) {
