@@ -61,7 +61,7 @@ function renderMenu(time: Ticker, app: Application, game: Game) {
     }
 }
 
-function renderGame(time: Ticker, app: Application, game: Game) {
+function renderGame(_: Ticker, app: Application, game: Game) {
 
     const stage = app.stage;
 
