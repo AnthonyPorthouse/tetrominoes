@@ -1,5 +1,5 @@
-import { Application, Assets, Container, Text } from "pixi.js";
-import { Game, render } from "./game";
+import { Application, Assets, Container } from "pixi.js";
+import { Game } from "./game";
 import "./style.css";
 import { buildUi } from "./ui";
 import { sounds } from "./ui/sounds";
@@ -10,77 +10,48 @@ import { sounds } from "./ui/sounds";
   await app.init({ background: "#000", resizeTo: window });
   document.body.appendChild(app.canvas);
 
-  await Assets.load('tetromino.webp')
+  await Assets.load("tetromino.webp");
 
-  sounds.bgm.play()
+  sounds.bgm.play();
 
-  let game = new Game(10, 24)
-  let stepTimer = 0;
+  let game = new Game(10, 24, app.stage);
+  game.gamestate = "playing";
 
-  app.ticker.add((time) => {
+  // app.ticker.add((time) => {
 
-    if (!app.stage.getChildByLabel('fps')) {
-      app.stage.addChild(new Text({
-        text: Math.round(time.FPS),
-        style: {
-          fill: 0xffffff,
-        },
-        label: 'fps'
-      }))
-    } else {
-      (app.stage.getChildByLabel('fps')! as Text).text = Math.round(time.FPS)
-    }
+  //   if (!app.stage.getChildByLabel('fps')) {
+  //     app.stage.addChild(new Text({
+  //       text: Math.round(time.FPS),
+  //       style: {
+  //         fill: 0xffffff,
+  //       },
+  //       label: 'fps'
+  //     }))
+  //   } else {
+  //     (app.stage.getChildByLabel('fps')! as Text).text = Math.round(time.FPS)
+  //   }
 
-    if (game.gamestate === 'playing') {
-      stepTimer = stepTimer % game.speed
-      stepTimer += 1 * time.elapsedMS;
-
-      if (time.elapsedMS % 100) {
-        const clearedRows = game.state.clearRows();
-        switch(clearedRows) {
-          case 1:
-            game.score += 100;
-            break;
-          case 2:
-            game.score += 300;
-            break;
-          case 3:
-            game.score += 500;
-            break;
-          case 4:
-            game.score += 800;
-            break;
-        }
-
-        game.speed -= 10 * clearedRows
-      }
-
-      if (stepTimer >= game.speed) {
-        game.state.moveTetrominoDown()
-      }
-    }
-
-    render(time, app, game)
-  });
+  //   render(time, app, game)
+  // });
 
   window.addEventListener(
     "keydown",
     (e) => {
       e.preventDefault();
 
-      if (game.gamestate == 'menu') {
-        if (e.key === 'Enter') {
-          game.gamestate = 'playing'
+      if (game.gamestate == "menu") {
+        if (e.key === "Enter") {
+          game.gamestate = "playing";
           app.stage = new Container();
           game.reset();
-          buildUi(app, game)
+          buildUi(app, game);
         }
       }
 
-      if (game.gamestate == 'playing') {
-        if (e.key === 'Escape') {
-          game.gamestate = 'menu'
-          app.stage = new Container()
+      if (game.gamestate == "playing") {
+        if (e.key === "Escape") {
+          game.gamestate = "menu";
+          app.stage = new Container();
         }
 
         if (e.key === "ArrowRight") {
@@ -92,32 +63,31 @@ import { sounds } from "./ui/sounds";
         }
 
         if (e.key === "ArrowDown") {
-          stepTimer = 0;
+          game.resetStepCooldown();
           game.state.moveTetrominoDown();
         }
 
         if (e.key === "ArrowUp") {
-          stepTimer = 0;
+          game.resetStepCooldown();
           let moved = true;
           do {
             moved = game.state.moveTetrominoDown();
-          } while(moved)
+          } while (moved);
         }
 
-        if (e.key === 'd') {
+        if (e.key === "d") {
           game.state.attemptTetrominoRotateClockwise();
         }
 
-        if (e.key === 'a') {
+        if (e.key === "a") {
           game.state.attemptTetrominoRotateAntiClockwise();
         }
 
-        if (e.key === 's') {
+        if (e.key === "s") {
           game.state.swapTetromino();
         }
       }
     },
-    { capture: true }
+    { capture: true },
   );
-
-})()
+})();

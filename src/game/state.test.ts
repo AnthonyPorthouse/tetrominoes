@@ -12,11 +12,7 @@ describe(State, async () => {
   describe("board state", async () => {
     test("it returns an empty board by default", async () => {
       expect(state.toString()).toBe(
-        "...\n" +
-        "...\n" +
-        "...\n" +
-        "...\n" +
-        "...\n"
+        "...\n" + "...\n" + "...\n" + "...\n" + "...\n",
       );
     });
 
@@ -26,11 +22,7 @@ describe(State, async () => {
       }
 
       expect(state.toString()).toBe(
-        ".#.\n" +
-        ".#.\n" +
-        ".#.\n" +
-        ".#.\n" +
-        ".#.\n"
+        ".#.\n" + ".#.\n" + ".#.\n" + ".#.\n" + ".#.\n",
       );
     });
   });
@@ -50,11 +42,7 @@ describe(State, async () => {
 
       test("it starts with a row", async () => {
         expect(state.toString()).toBe(
-            "...\n"+
-            "...\n"+
-            "...\n"+
-            "...\n"+
-            "###\n"
+          "...\n" + "...\n" + "...\n" + "...\n" + "###\n",
         );
       });
 
@@ -66,52 +54,40 @@ describe(State, async () => {
         state.clearRows();
 
         expect(state.toString()).toBe(
-            "...\n"+
-            "...\n"+
-            "...\n"+
-            "...\n"+
-            "...\n"
+          "...\n" + "...\n" + "...\n" + "...\n" + "...\n",
         );
       });
     });
 
     describe("it moves blocks down when it clears a row", async () => {
-        beforeEach(() => {
-          state = new State(3, 5);
-          for (let i = 0; i < state.width; i++) {
-            state.setBlock(new Point(i, state.height - 1));
-          }
+      beforeEach(() => {
+        state = new State(3, 5);
+        for (let i = 0; i < state.width; i++) {
+          state.setBlock(new Point(i, state.height - 1));
+        }
 
-          state.setBlock(new Point(0, 1))
-          state.setBlock(new Point(1, 2))
-          state.setBlock(new Point(1, 3))
-        });
-
-        test("it moves blocks down when it clears a row", async () => {
-          expect(state.toString()).toBe(
-              "...\n"+
-              "#..\n"+
-              ".#.\n"+
-              ".#.\n"+
-              "###\n"
-          );
-        });
-
-        test("it clears a row", async () => {
-          expect(state.clearRows()).toBe(1);
-        });
-
-        test("it has no rows", async () => {
-          state.clearRows();
-
-          expect(state.toString()).toBe(
-              "...\n"+
-              "...\n"+
-              "#..\n"+
-              ".#.\n"+
-              ".#.\n"
-          );
-        });
+        state.setBlock(new Point(0, 1));
+        state.setBlock(new Point(1, 2));
+        state.setBlock(new Point(1, 3));
       });
+
+      test("it moves blocks down when it clears a row", async () => {
+        expect(state.toString()).toBe(
+          "...\n" + "#..\n" + ".#.\n" + ".#.\n" + "###\n",
+        );
+      });
+
+      test("it clears a row", async () => {
+        expect(state.clearRows()).toBe(1);
+      });
+
+      test("it has no rows", async () => {
+        state.clearRows();
+
+        expect(state.toString()).toBe(
+          "...\n" + "...\n" + "#..\n" + ".#.\n" + ".#.\n",
+        );
+      });
+    });
   });
 });

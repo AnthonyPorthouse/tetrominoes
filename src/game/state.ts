@@ -1,3 +1,4 @@
+import { Container } from "pixi.js";
 import { sounds } from "../ui/sounds";
 import { Point } from "../utils";
 import { Block } from "./block";
@@ -9,9 +10,8 @@ export class State {
 
   private _board: Record<string, Block | undefined>;
   private _tetromino: Tetromino;
-  private _tetrominoPosition: Point;
 
-  private _heldTetromino?: Tetromino
+  private _heldTetromino?: Tetromino;
 
   private _blockBag: TetrominoBag = new TetrominoBag();
 
@@ -22,11 +22,15 @@ export class State {
     this._board = {};
 
     this._tetromino = this.blockBag.getNext();
-    this._tetrominoPosition = this.resetPosition;
+    this.tetromino.position = this.resetPosition;
   }
 
   private get resetPosition() {
     return new Point(Math.floor((this.width - 4) / 2), 0);
+  }
+
+  get board() {
+    return this._board;
   }
 
   get width() {
@@ -44,27 +48,41 @@ export class State {
   get tetromino() {
     return this._tetromino;
   }
-  get tetrominoPosition() {
-    return this._tetrominoPosition;
+
+  set tetromino(t: Tetromino) {
+    this._tetromino = t;
   }
 
   get held() {
-    return this._heldTetromino
+    return this._heldTetromino;
   }
 
   swapTetromino() {
     if (!this._heldTetromino) {
       this._heldTetromino = this._tetromino;
-      this._tetromino = this._blockBag.getNext()
+      this._heldTetromino.position = new Point(0, 0)
+      this._tetromino = this._blockBag.getNext();
+      this._tetromino.position = this.resetPosition
     } else {
       const held = this._heldTetromino;
       const current = this._tetromino;
+
+      const currentPos = current.position;
+
       this._tetromino = held;
+      this._tetromino.position = currentPos
+
       this._heldTetromino = current;
+      this._heldTetromino.position = new Point(0, 0);
+
     }
   }
 
   setBlock(point: Point, block?: Block) {
+    if (block) {
+      block.point = point
+    }
+
     this._board[point.toKey()] = block ?? new Block(point);
   }
 
@@ -149,10 +167,10 @@ export class State {
   }
 
   moveTetrominoRight() {
-    const nextPos = this.tetrominoPosition.add(new Point(1, 0));
+    const nextPos = this.tetromino.position.add(new Point(1, 0));
 
     if (this.canMoveToPos(nextPos)) {
-      this._tetrominoPosition = nextPos;
+      this.tetromino.position = nextPos;
       return true;
     }
 
@@ -160,10 +178,10 @@ export class State {
   }
 
   moveTetrominoLeft() {
-    const nextPos = this.tetrominoPosition.add(new Point(-1, 0));
+    const nextPos = this.tetromino.position.add(new Point(-1, 0));
 
     if (this.canMoveToPos(nextPos)) {
-      this._tetrominoPosition = nextPos;
+      this.tetromino.position = nextPos;
       return true;
     }
 
@@ -171,11 +189,11 @@ export class State {
   }
 
   moveTetrominoDown() {
-    const nextPos = this._tetrominoPosition.add(new Point(0, 1));
+    const nextPos = this.tetromino.position.add(new Point(0, 1));
     const canMove = this.canMoveToPos(nextPos);
 
     if (canMove) {
-      this._tetrominoPosition = nextPos;
+      this.tetromino.position = nextPos;
       return true;
     }
 
@@ -184,18 +202,18 @@ export class State {
     sounds.thud.play();
 
     Object.values(this.tetromino.blocks).map((block) => {
-      const newBlockPos = this._tetrominoPosition.add(block.point);
+      const newBlockPos = this.tetromino.position.add(block.point);
       this.setBlock(newBlockPos, block);
     });
 
     this._tetromino = this.blockBag.getNext();
-    this._tetrominoPosition = this.resetPosition;
+    this.tetromino.position = this.resetPosition;
 
     return false;
   }
 
   attemptTetrominoRotateClockwise() {
-    const originalPosition = this._tetrominoPosition;
+    const originalPosition = this.tetromino.position;
 
     this.tetromino.rotateClockwise();
     const wallkickPositions = this.tetromino.wallkickPositions.cw;
@@ -203,7 +221,7 @@ export class State {
     for (let offset of wallkickPositions) {
       const position = originalPosition.add(offset);
       if (this.canMoveToPos(position)) {
-        this._tetrominoPosition = position;
+        this.tetromino.position = position;
         return true;
       }
     }
@@ -213,7 +231,7 @@ export class State {
   }
 
   attemptTetrominoRotateAntiClockwise() {
-    const originalPosition = this._tetrominoPosition;
+    const originalPosition = this.tetromino.position;
 
     this.tetromino.rotateAntiClockwise();
     const wallkickPositions = this.tetromino.wallkickPositions.ccw;
@@ -221,7 +239,7 @@ export class State {
     for (let offset of wallkickPositions) {
       const position = originalPosition.add(offset);
       if (this.canMoveToPos(position)) {
-        this._tetrominoPosition = position;
+        this.tetromino.position = position;
         return true;
       }
     }
@@ -241,5 +259,13 @@ export class State {
     }
 
     return out;
+  }
+
+  render(boardContainer: Container) {
+    Object.values(this.board).map((b) => {
+      if (b) {
+        boardContainer.addChild(b.render());
+      }
+    });
   }
 }

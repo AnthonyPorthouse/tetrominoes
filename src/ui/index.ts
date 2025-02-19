@@ -1,2 +1,2 @@
-export { getBoard } from './board'
-export { buildUi } from './ui'
+export { getBoard } from "./board";
+export { buildUi } from "./ui";
